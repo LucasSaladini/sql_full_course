@@ -67,5 +67,14 @@ SELECT
   CustomerID,
   LastName,
   Score,
+   CASE
+      WHEN Score IS NULL THEN 0
+      ELSE Score
+   END ScoreClean,
+   AVG(CASE
+         WHEN Score IS NULL THEN 0
+         ELSE Score
+      END) OVER() AvgCustomerClean,
   AVG(Score) OVER () AS AvgCustomer
 FROM Sales.Customers;
+

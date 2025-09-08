@@ -166,3 +166,24 @@ SELECT
   AVG(Sales) OVER (PARTITION BY ProductID ORDER BY OrderDate) MovingAvg,
   AVG(Sales) OVER (PARTITION BY ProductID ORDER BY OrderDate ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING) RollingAvg
 FROM Sales.Orders;
+
+-- Calculate the moving average of sales for each product over time
+SELECT
+  OrderID,
+  ProductID,
+  OrderDate,
+  Sales,
+  AVG(Sales) OVER (PARTINTION BY ProductID) AvgByProduct,
+  AVG(Sales) OVER (PARTITION BY ProductID GROUP BY OrderDate ASC) MovingAvg
+FROM Sales.Orders;
+
+-- Calculate the moving average of sales for each product over time, including only the next order
+SELECT
+  OrderID,
+  ProductID,
+  OrderDate
+  Sales,
+  AVG(Sales) OVER (PARTITION BY ProductID) AvgByProduct,
+  AVG(Sales) OVER (PARTITION BY ProductID GROUP BY OrderDate ASC) MovingAVg,
+  AVG(Sales) OVER (PARTITION BY ProductID GROUP BY OrderDate ASC ROWS BETWEEN CURRENT ROW AND 1 FOLLOWING) RollingAvg 
+FROM Sales.Orders;

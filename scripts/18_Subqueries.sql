@@ -105,3 +105,18 @@ SELECT
  *,
  (SELECT COUNT(*) FROM Sales.Orders o WHERE o.CustomerID = c.CustomerID) TotalSales
 FROM Sales.Customers c
+
+-- Show the order details for customers in Germany
+SELECT
+FROM Sales.Orders o
+WHERE EXISTS ( SELECT 1
+               FROM Sales.Customers c
+               WHERE Country = 'Germany'
+               AND o.CustomerID = c.CustomerID)
+
+SELECT
+FROM Sales.Orders o
+WHERE NOT EXISTS ( SELECT 1
+               FROM Sales.Customers c
+               WHERE Country = 'Germany'
+               AND o.CustomerID = c.CustomerID)

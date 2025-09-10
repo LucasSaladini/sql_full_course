@@ -46,3 +46,5 @@ CREATE OR REPLACE VIEW V_Monthly_Summary AS
 IF OBJECT_ID('V_Monthly_Summary', 'V') IS NOT NULL
   DROP VIEW V_Monthly_Summary;
 GO
+
+-- Provide a view that combines details from orders, products, customers, and employees

@@ -44,3 +44,40 @@ LEFT JOIN (
  FROM Sales.Orders
  GROUP BY CustomerID) o
 ON c.CustomerID = o.CustomerID
+
+-- Find the products that have a price higher than the average price of all products
+SELECT
+ ProductID,
+ Price,
+ (SELECT AVG(Price) FROM Sales.Products) AvgPrice
+FROM Sales.Products
+WHERE Price > (SELECT AVG(Price) FROM Sales.Products)
+
+-- Show the details of orders made by customers in Germany
+SELECT
+ *
+FROM Sales.Orders
+WHERE CustomerID IN 
+                 (SELECT
+                 CustomerID
+                FROM Sales.Customers
+                WHERE Country = 'Germany')
+
+-- Show the details of orders for customers who are not from Germany
+SELECT
+ *
+FROM Sales.Orders
+WHERE CustomerID IN 
+                 (SELECT
+                 CustomerID
+                FROM Sales.Customers
+                WHERE Country != 'Germany')
+
+SELECT
+ *
+FROM Sales.Orders
+WHERE CustomerID NOT IN 
+                 (SELECT
+                 CustomerID
+                FROM Sales.Customers
+                WHERE Country = 'Germany')

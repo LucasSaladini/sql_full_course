@@ -30,3 +30,19 @@ SELECT
   TotalSales,
   SUM(TotalSales) OVER (ORDER BY OrderMonth ASC) AS RunningTotal
 FROM V_Monthly_Summary
+-- Alter view
+DROP VIEW V_Monthly_Summary
+  
+CREATE OR REPLACE VIEW V_Monthly_Summary AS
+(
+    SELECT
+      DATETRUNC(month, OrderDate) OrderMonth,
+      SUM(Sales) TotalSales,
+      COUNT(OrderID) TotalOrders,
+    FROM Sales.Orders
+    GROUP BY DATETRUNC(month, OrderDate)
+  )
+-- T-SQL
+IF OBJECT_ID('V_Monthly_Summary', 'V') IS NOT NULL
+  DROP VIEW V_Monthly_Summary;
+GO

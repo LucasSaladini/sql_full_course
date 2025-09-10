@@ -99,3 +99,9 @@ SELECT
 FROM Sales.Employees
 WHERE Gender = 'F'
 AND Salary > ALL (SELECT Salary FROM Sales.Employees WHERE Gender = 'M')
+
+-- Show all customer details and find the total orders for each customer
+SELECT
+ *,
+ (SELECT COUNT(*) FROM Sales.Orders o WHERE o.CustomerID = c.CustomerID) TotalSales
+FROM Sales.Customers c

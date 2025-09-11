@@ -45,3 +45,5 @@ END
 EXEC GetCustomerSummary @Country = 'Germany'
 
 EXEC GetCustomerSummary @Country = 'USA'
+
+DROP PROCEDURE GetCustomerSummaryGermany

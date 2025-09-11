@@ -51,12 +51,17 @@ DROP PROCEDURE GetCustomerSummaryGermany
 --Define stored procedure
 ALTER PROCEDURE  GetCustomerSummary @Country NVARCHAR(50) = 'USA' AS
 BEGIN
+  -- Variables
+  DECLARE @TotalCustomers INT, @AvgScore FLOAT;
+  
   SELECT
-    COUNT(*) TotalCustomers,
-    AVG(Score) AvgScore
+    @TotalCustomers = COUNT(*),
+    @AvgScore = AVG(Score)
   FROM Sales.Customers
   WHERE Country = @Country;
-
+  
+  PRINT 'Total Customer from ' + @Country + ': ' + CAST(@TotalCustomers AS NVARCHAR);
+  PRINT 'Average Score from ' + @Country + ': ' + CAST(@AvgScore AS NVARCHAR);
   -- Find the total Nr. of orders and total sales
   SELECT
     COUNT(OrderID) TotalOrders,

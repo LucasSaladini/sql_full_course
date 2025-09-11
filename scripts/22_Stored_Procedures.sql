@@ -51,41 +51,52 @@ DROP PROCEDURE GetCustomerSummaryGermany
 --Define stored procedure
 ALTER PROCEDURE  GetCustomerSummary @Country NVARCHAR(50) = 'USA' AS
 BEGIN
-  -- Variables
-  DECLARE @TotalCustomers INT, @AvgScore FLOAT;
-
-  -- Prepare & Cleanup Data
-  IF EXISTS (SELECT 1 FROM Sales.Customers WHERE Score IS NULL AND Country = @Country)
-  BEGIN
-    PRINT('Updating NULL Scores to 0');
-    UPDATE Sales.Customers
-    SET Score = 0
-    WHERE Score IS NULL AND Country = @Country;
-  END
-
-  ELSE
-  BEGIN
-    PRINT('No NULL Scores found');
-  END;
+  BEGIN TRY
+    -- Variables
+    DECLARE @TotalCustomers INT, @AvgScore FLOAT;
   
-  -- Generating Report
-  SELECT
-    @TotalCustomers = COUNT(*),
-    @AvgScore = AVG(Score)
-  FROM Sales.Customers
-  WHERE Country = @Country;
+    -- Prepare & Cleanup Data
+    IF EXISTS (SELECT 1 FROM Sales.Customers WHERE Score IS NULL AND Country = @Country)
+    BEGIN
+      PRINT('Updating NULL Scores to 0');
+      UPDATE Sales.Customers
+      SET Score = 0
+      WHERE Score IS NULL AND Country = @Country;
+    END
   
-  PRINT 'Total Customer from ' + @Country + ': ' + CAST(@TotalCustomers AS NVARCHAR);
-  PRINT 'Average Score from ' + @Country + ': ' + CAST(@AvgScore AS NVARCHAR);
-  -- Find the total Nr. of orders and total sales
-  SELECT
-    COUNT(OrderID) TotalOrders,
-    SUM(Sales) TotalSales
-  FROM Sales.Orders o
-  JOIN Sales.Customers c
-    ON c.CustomerID = o.CustomerID
-  WHERE c.Country = @Country;
+    ELSE
+    BEGIN
+      PRINT('No NULL Scores found');
+    END;
+    
+    -- Generating Report
+    SELECT
+      @TotalCustomers = COUNT(*),
+      @AvgScore = AVG(Score)
+    FROM Sales.Customers
+    WHERE Country = @Country;
+    
+    PRINT 'Total Customer from ' + @Country + ': ' + CAST(@TotalCustomers AS NVARCHAR);
+    PRINT 'Average Score from ' + @Country + ': ' + CAST(@AvgScore AS NVARCHAR);
+  
+    -- Find the total Nr. of orders and total sales
+    SELECT
+      COUNT(OrderID) TotalOrders,
+      SUM(Sales) TotalSales
+    FROM Sales.Orders o
+    JOIN Sales.Customers c
+      ON c.CustomerID = o.CustomerID
+    WHERE c.Country = @Country;
+  END TRY
+  BEGIN CATCH
+    PRINT('An error occured.');
+    PRINT('Erro Message: ' + ERROR_MESSAGE());
+    PRINT('Error Number: ' + CAST(ERROR_NUMBER() AS NVARCHAR));
+    PRINT('Error Line: ' + CAST(ERROR_LINE() AS NVARCHAR);
+    PRINT('Error Procedure ' + ERROR_PROCEDURE());
+  END CATCH
 END
-
+GO
+    
 EXEC GetCustomerSummary
 EXEC GetCustomerSummary @Country = 'Germany'

@@ -55,9 +55,17 @@ BEGIN
     COUNT(*) TotalCustomers,
     AVG(Score) AvgScore
   FROM Sales.Customers
-  WHERE Country = @Country
+  WHERE Country = @Country;
+
+  -- Find the total Nr. of orders and total sales
+  SELECT
+    COUNT(OrderID) TotalOrders,
+    SUM(Sales) TotalSales
+  FROM Sales.Orders o
+  JOIN Sales.Customers c
+    ON c.CustomerID = o.CustomerID
+  WHERE c.Country = @Country;
 END
 
-EXEC GetCustomerSummary @Country = 'Germany'
-  
 EXEC GetCustomerSummary
+EXEC GetCustomerSummary @Country = 'Germany'

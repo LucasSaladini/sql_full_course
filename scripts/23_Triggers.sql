@@ -16,3 +16,9 @@ BEGIN
     GETDATE()
   FROM INSERTED
 END
+
+INSERT INTO Sales.Employees
+VALUES
+(6, 'Maria', 'Doe', 'HR', '1998-01-12', 'F', 80000, 3)
+
+SELECT * FROM Sales.EmployeeLogs

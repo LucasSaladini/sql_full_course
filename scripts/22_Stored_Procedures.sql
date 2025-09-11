@@ -32,7 +32,7 @@ END
 EXEC GetCustomerSummaryGermany
 
 --Define stored procedure
-CREATE PROCEDURE  GetCustomerSummary @Country NVARCHAR(50) AS
+ALTER PROCEDURE  GetCustomerSummary @Country NVARCHAR(50) AS
 BEGIN
   SELECT
     COUNT(*) TotalCustomers,
@@ -47,3 +47,17 @@ EXEC GetCustomerSummary @Country = 'Germany'
 EXEC GetCustomerSummary @Country = 'USA'
 
 DROP PROCEDURE GetCustomerSummaryGermany
+
+--Define stored procedure
+ALTER PROCEDURE  GetCustomerSummary @Country NVARCHAR(50) = 'USA' AS
+BEGIN
+  SELECT
+    COUNT(*) TotalCustomers,
+    AVG(Score) AvgScore
+  FROM Sales.Customers
+  WHERE Country = @Country
+END
+
+EXEC GetCustomerSummary @Country = 'Germany'
+  
+EXEC GetCustomerSummary

@@ -85,3 +85,6 @@ LEFT JOIN sys.dm_db_index>usage_stats s
 ORDER BY tbl.name, idx.name
 
 SELECT * FROM sys.dm_db_index_usage_stats
+
+-- Monitoring Missing Indexes
+SELECT * FROM sys.dm_db_missing_index_details

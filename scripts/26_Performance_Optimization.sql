@@ -345,3 +345,105 @@ SELECT
     WHEN Salary < AVG(Salary) OVER() THEN 'Below Average'
   END AS Status
 FROM Sales.Employees;
+
+-- Tip 21: Avoid data types VARCHAR & TEXT
+---- Before
+CREATE TABLE CustomersInfo (
+  CustomerID INT,
+  FirstName VARCHAR(MAX),
+  LastName TEXT,
+  Country VARCHAR(255),
+  TotalPurchases FLOAT,
+  Score VARCHAR(255),
+  BirthDate VARCHAR(255),
+  EmployeeID INT,
+  CONSTRAINT FK_CustomersInfo_EmployeeID FOREIGN KEY (EmployeeID)
+    REFERENCES Sales.Employees(EmployeeID)
+);
+
+---- After
+CREATE TABLE CustomersInfo (
+  CustomerID INT,
+  FirstName VARCHAR(MAX),
+  LastName VARCHAR(50),
+  Country VARCHAR(255),
+  TotalPurchases FLOAT,
+  Score INT,
+  BirthDate DATE,
+  EmployeeID INT,
+  CONSTRAINT FK_CustomersInfo_EmployeeID FOREIGN KEY (EmployeeID)
+    REFERENCES Sales.Employees(EmployeeID)
+);
+
+-- Tip 22: Avoid using (MAX) unnecessarily large lengths in data types
+---- Before
+CREATE TABLE CustomersInfo (
+  CustomerID INT,
+  FirstName VARCHAR(MAX),
+  LastName TEXT,
+  Country VARCHAR(255),
+  TotalPurchases FLOAT,
+  Score VARCHAR(255),
+  BirthDate VARCHAR(255),
+  EmployeeID INT,
+  CONSTRAINT FK_CustomersInfo_EmployeeID FOREIGN KEY (EmployeeID)
+    REFERENCES Sales.Employees(EmployeeID)
+);
+
+---- After
+CREATE TABLE CustomersInfo (
+  CustomerID INT,
+  FirstName VARCHAR(50),
+  LastName VARCHAR(50),
+  Country VARCHAR(50),
+  TotalPurchases FLOAT,
+  Score INT,
+  BirthDate DATE,
+  EmployeeID INT,
+  CONSTRAINT FK_CustomersInfo_EmployeeID FOREIGN KEY (EmployeeID)
+    REFERENCES Sales.Employees(EmployeeID)
+);
+
+-- Tip 23: Use the NOT NULL constraint where applicable
+CREATE TABLE CustomersInfo (
+  CustomerID INT,
+  FirstName VARCHAR(50) NOT NULL,
+  LastName VARCHAR(50) NOT NULL,
+  Country VARCHAR(50) NOT NULL,
+  TotalPurchases FLOAT,
+  Score INT,
+  BirthDate DATE,
+  EmployeeID INT,
+  CONSTRAINT FK_CustomersInfo_EmployeeID FOREIGN KEY (EmployeeID)
+    REFERENCES Sales.Employees(EmployeeID)
+);
+
+-- Tip 24: Ensure all your tables have a clustered primary key
+CREATE TABLE CustomersInfo (
+  CustomerID INT PRIMARY KEY CLUSTERED,
+  FirstName VARCHAR(50) NOT NULL,
+  LastName VARCHAR(50) NOT NULL,
+  Country VARCHAR(50) NOT NULL,
+  TotalPurchases FLOAT,
+  Score INT,
+  BirthDate DATE,
+  EmployeeID INT,
+  CONSTRAINT FK_CustomersInfo_EmployeeID FOREIGN KEY (EmployeeID)
+    REFERENCES Sales.Employees(EmployeeID)
+);
+
+-- Tip 25: Create a non-clustered index for foreign keys that are used frequently
+CREATE TABLE CustomersInfo (
+  CustomerID INT PRIMARY KEY CLUSTERED,
+  FirstName VARCHAR(50) NOT NULL,
+  LastName VARCHAR(50) NOT NULL,
+  Country VARCHAR(50) NOT NULL,
+  TotalPurchases FLOAT,
+  Score INT,
+  BirthDate DATE,
+  EmployeeID INT,
+  CONSTRAINT FK_CustomersInfo_EmployeeID FOREIGN KEY (EmployeeID)
+    REFERENCES Sales.Employees(EmployeeID)
+);
+
+CREATE NONCLUSTERED INDEX IX_Good_Customers_EmployeeID ON CustomersInfo(EmployeeID);

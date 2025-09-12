@@ -257,7 +257,7 @@ FROM Sales.Orders
 UNION
 SELECT
   CustomerID
-FROM Sales.OrdersArchive
+FROM Sales.OrdersArchive;
 
 ---- Best Practice
 SELECT DISTINCT CustomerID
@@ -269,4 +269,79 @@ FROM (
   SELECT
     CustomerID
   FROM Sales.OrdersArchive
-) AS CombinedData
+) AS CombinedData;
+
+-- Tip 17: Use Columnstore Index for aggregations on large tables
+CREATE CLUSTERED COLUMNSTORE INDEX Idx_Orders_Columnstore ON Sales.Orders;
+
+SELECT
+  CustomerID,
+  COUNT(OrderID) AS OrderCount
+FROM Sales.Orders
+GROUP BY CustomerID;
+
+-- Tipo 18: Pre-Aggreggate data and store it in new table for reporting
+SELECT
+  MONTH(OrderDate) OrderYear,
+  SUM(Sales) AS TotalSales
+INTO Sales.SalesSummary
+FROM Sales.Orders
+GROUP BY MONTH(OrderDate)
+
+SELECT
+  OrderYear,
+  TotalSales
+FROM Sales.SalesSummary;
+
+-- Tip 19: JOIN vs EXISTS vs IN (Avoid using IN)
+---- JOIN (Best Practice: If the Performance equals to EXISTS)
+SELECT o.OrderID, o.Sales
+FROM Sales.Orders AS o
+INNER JOIN Sales.Customers AS c
+    ON o.CustomerID = c.CustomerID
+WHERE c.Country = 'USA';
+
+---- EXISTS (Best Practice: Use it for Large Tables)
+SELECT o.OrderID, o.Sales
+FROM Sales.Orders AS o
+WHERE EXISTS (
+    SELECT 1
+    FROM Sales.Customers AS c
+    WHERE c.CustomerID = o.CustomerID
+      AND c.Country = 'USA'
+);
+
+---- IN (Bad Practice)
+SELECT o.OrderID, o.Sales
+FROM Sales.Orders AS o
+WHERE o.CustomerID IN (
+    SELECT CustomerID
+    FROM Sales.Customers
+    WHERE Country = 'USA'
+);
+
+-- Tip 20: Avoid redundant logic in your query
+---- Bad Practice
+SELECT
+  EmployeeID,
+  FirstName,
+  'Above Average' Status
+FROM Sales.Employees
+WHERE Salary > (SELECT AVG(Salary) FROM Sales.Employees)
+UNION ALL
+SELECT
+  EmployeeID,
+  FirstName,
+  'Below Average' Status
+FROM Sales.Employees
+WHERE Salary < (SELECT (AVG(Salary) FROM Sales.Employees);
+
+---- Good Practice
+SELECT
+  EmployeeID,
+  FirstName,
+  CASE
+    WHEN Salary > AVG(Salary) OVER() THEN 'Above Average'
+    WHEN Salary < AVG(Salary) OVER() THEN 'Below Average'
+  END AS Status
+FROM Sales.Employees;

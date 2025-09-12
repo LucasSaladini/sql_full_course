@@ -452,3 +452,4 @@ CREATE NONCLUSTERED INDEX IX_Good_Customers_EmployeeID ON CustomersInfo(Employee
 -- Tip 27: Drop unused indexes
 -- Tip 28: Update statistics weekly
 -- Tip 29: Reorganize & rebuild indexes weekly
+--Tip 30: For large tables (e.g., fact tables), partition the data and then apply a columnstore index for best performance results

@@ -187,3 +187,86 @@ SELECT
      FROM Sales.Orders AS o
      WHERE o.CustomerID = c.CustomerID) AS OrderCount
 FROM Sales.Customers AS c;
+
+-- Tip 13: Use Union instead of OR in Joins
+---- Bad Practice
+SELECT
+  o.OrderID,
+  c.FirstName
+FROM Sales.Customers c
+INNER JOIN Sales.Orders o
+ON c.CustomerID = o.CustomerID
+OR c.CustomerID = o.SalesPersonID;
+
+---- Best Practice
+SELECT
+  o.OrderID,
+  c.FirstName
+FROM Sales.Customers c
+INNER JOIN Sales.Orders o
+  ON c.CustomerID = o.CustomerID
+UNION
+SELECT
+  o.OrderID,
+  c.FirstName
+FROM Sales.Customers c
+INNER JOIN Sales.Orders o
+  ON c.CustomerID = o.SalesPersonID;
+
+-- Tip 14: Check for nested loops and use SQL Hints
+SELECT
+  o.OrderID,
+  c.FirstName
+FROM Sales.Customers c
+INNER JOIN Sales.Orders o
+  ON c.CustomerID = o.CustomerID;
+
+---- Good practice for having big table & small table
+SELECT
+  o.OrderID,
+  c.FirstName
+FROM Sales.Customers c
+INNER JOIN Sales.Orders o
+  ON c.CustomerID = o.CustomerID
+OPTION (HASH JOIN);
+
+-- Tip 15: Use UNION ALL instead of using UNION if duplicates are acceptable or there are no duplicates
+---- Bad Practice
+SELECT
+  CustomerID
+FROM Sales.Orders
+UNION
+SELECT
+  CustomerID
+FROM sales.OrdersArchive;
+
+---- Best Practice
+SELECT
+  CustomerID
+FROM Sales.Orders
+UNION ALL
+SELECT
+  CustomerID
+FROM Sales.OrdersArchive;
+
+-- Use UNION ALL + DISTINCT instead of using UNION if duplicates are not acceptable
+---- Bad Practice
+SELECT
+  CustomerID
+FROM Sales.Orders
+UNION
+SELECT
+  CustomerID
+FROM Sales.OrdersArchive
+
+---- Best Practice
+SELECT DISTINCT CustomerID
+FROM (
+  SELECT
+    CustomerID
+  FROM Sales.Orders
+  UNION ALL
+  SELECT
+    CustomerID
+  FROM Sales.OrdersArchive
+) AS CombinedData

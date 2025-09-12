@@ -447,3 +447,8 @@ CREATE TABLE CustomersInfo (
 );
 
 CREATE NONCLUSTERED INDEX IX_Good_Customers_EmployeeID ON CustomersInfo(EmployeeID);
+
+-- Tip 26: Avoid over indexing
+-- Tip 27: Drop unused indexes
+-- Tip 28: Update statistics weekly
+-- Tip 29: Reorganize & rebuild indexes weekly

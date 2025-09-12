@@ -101,3 +101,27 @@ JOIN sys.tables tbl ON idx.object_id = tbl.object_id
 JOIN sys.index_columns ic ON idx.object_id = ic.object_id AND idx.index_id = ic.index_id
 JOIN sys.columns col ON ic.object_id = col.object_id AND ic.column_id = col.column_id
 ORDER BY tbl.name, col.name
+
+-- Update Statistics
+SELECT
+  SCHEMA_NAME(t.schema_id) AS SchemaName,
+  t.name AS TableName,
+  s.name AS StatisticName,
+  sp.last_updated AS LastUpdate,
+  DATEDIFF(day, sp.last_updated, GETDATE()) AS LastUpdateDay,
+  sp.rows AS 'Rows',
+  sp.modification_counter AS ModificationsSinceLastUpdate
+FROM sys.stats AS s
+JOIN sys.tables t
+  ON s.object_id = t.object_id
+CROSS APPLY sys.dm_db_stats_properties(s.object_id, s.stats_id) AS sp
+ORDER BY sp.modification_counter DESC;
+
+UPDATE STATISTICS Sales.DBCustomers _WA_Sys_00000001_6EF57B66
+GO
+
+UPDATE STATISTICS Sales.DBCustomers
+GO
+  
+EXEC sp_updatestats
+GO

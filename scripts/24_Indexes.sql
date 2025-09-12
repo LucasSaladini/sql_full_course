@@ -125,3 +125,27 @@ GO
   
 EXEC sp_updatestats
 GO
+
+-- Fragementations
+SELECT
+  tbl.name AS TableName,
+  idx.name AS IndexName,
+  s.avg_fragmentation_in_percent,
+  s.page_count
+FROM sys.dm_db_index_physical_stats (DB_ID(), NULL, NULL, NULL, 'LIMITED') AS s
+INNER JOIN sys.tables tbl
+  ON s.object_id = tbl.object_id
+INNER JOIN sys.indexes AS idx
+  ON idx.object_id = s.object_id
+  AND idx.index_id = s.index_id
+ORDER BY s.avg_fragmentation_in_percent DESC
+
+-- <10% No action needed
+-- 10 - 30% Reorganize
+-- >30% Rebuild
+
+-- Reorganize the index (lightweight defragmentation)
+ALTER INDEX idx_Customers_CS_Country ON Sales.Customers REORGANIZE
+
+-- Rebuild the index (full rebuild, more resource-intensive)
+ALTER INDEX idx_Customers_Country ON Sales.Customers REBUILD

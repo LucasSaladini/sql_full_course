@@ -1,0 +1,189 @@
+-- Tip 1: Select Only What You Need
+---- Bad Practice
+SELECT * FROM Sales.Customers;
+
+---- Good Practice
+SELECT CustomerID, FirstName, LastName FROM Sales.Customers;
+
+-- Tip 2: Avoid unnecessary DISTINCT & ORDER BY
+---- Bad Practice
+SELECT DISTINCT
+  FirstName
+FROM Sales.Customers
+ORDER BY FirstName;
+
+---- Good Practice
+SELECT FirstName
+FROM Sales.Customers;
+
+-- Tip 3: For exploration purpose, limite the rows
+---- Bad Practice
+SELECT
+  OrderID,
+  Sales
+FROM Sales.Orders;
+
+---- Good Practice
+SELECT TOP 10
+  OrderID,
+  Sales
+FROM Sales.Orders;
+
+-- Tip 4: Create nonclustered Index on frequently used columns in WHERE clause
+SELECT * FROM Sales.Orders WHERE OrderStatus = 'Delivered';
+
+CREATE NONCLUSTERED INDEX Idx_Orders_OrderStatus ON Sales.Orders(OrderStatus);
+
+-- Tip 5: Avoid applying functions to columns in WHERE clauses
+---- Bad Practice
+SELECT * FROM Sales.Orders
+WHERE LOWER(OrderStatus) = 'delivered';
+
+SELECT * FROM Sales.Customers
+WHERE SUBSTRING(FirstName, 1, 1) = 'A';
+
+SELECT * FROM Sales.Orders
+WHERE YEAR(OrderDate) = 2025;
+
+---- Good Practice
+SELECT * FROM Sales.Orders
+WHERE OrderStatus = 'Delivered';
+
+SELECT * FROM Sales.Customers
+WHERE FirstName LIKE 'A%';
+
+SELECT * FROM Sales.Orders
+WHERE OrderDate BETWEEN '2025-01-01' AND '2025-12-31';
+
+-- Tip 6: Avoid leading wildcards as they prevent index usage
+---- Bad Practice
+SELECT * FROM Sales.Customers
+WHERE LastName LIKE '%Gold%';
+
+---- Good Pratice
+SELECT * FROM Sales.Customers
+WHERE LastName LIKE 'Gold%';
+
+-- Tip 7: Use IN instead of multiple OR
+---- Bad Practice
+SELECT * FROM Sales.Orders
+WHERE CustomerID = 1 OR CustomerID = 2 OR CustomerID = 3;
+
+---- Good Practice
+SELECT * FROM Sales.Orders
+WHERE CustomerID IN (1, 2, 3);
+
+-- Tip 8: Understand the speed of Joins & use INNER JOIN when possible
+---- Best Performance
+SELECT
+  c.FirstName,
+  o.OrderID
+FROM Sales.Customers c
+INNER JOIN Sales.Orders o
+  ON c.CustomerID = o.CustomerID;
+
+---- Sligghtly Slower Performance
+SELECT
+  c.FirstName,
+  o.OrderID
+FROM Sales.Customers c
+RIGHT JOIN Sales.Orders o
+  ON c.CustomerID = o.CustomerID;
+
+SELECT
+  c.FirstName,
+  o.OrderID
+FROM Sales.Customers c
+LEFT JOIN Sales.Orders o
+  ON c.CustomerID = o.CustomerID;
+
+---- Worst Performance
+SELECT
+  c.FirstName,
+  o.OrderID
+FROM Sales.Customers c
+OUTER JOIN Sales.Orders o
+  ON c.CustomerID = o.CustomerID;
+
+-- Tip 9: Use explicit Join (ANSI Join) instead of Implicit Join (non-ANSI Join)
+---- Bad Practice
+SELECT
+  o.OrderID,
+  c.FirstName
+FROM Sales.Customers c, Sales.Orders o
+WHERE c.CustomerID = o.CustomerID;
+
+---- Good Practice
+SELECT
+  o.OrderID,
+  c.FirstName
+FROM Sales.Customers c
+INNER JOIN Sales.Orders o
+  ON c.CustomerID = o.CustomerID;
+
+-- Tip 10: Make sure to Index the columns used in the ON clause
+CREATE NONCLUSTERED INDEX IX_order_CustomerID ON Sales.Orders(CustomerID);
+  
+SELECT
+  c.FirstName,
+  o.OrderID
+FROM Sales.Orders o
+INNER JOIN Sales.Customers c
+  ON c.CustomerID = o.CustomerID;
+
+-- Tip 11: Filter Before Joining (Big Tables)
+---- Best Practice For Small-Medium Tables
+------ Filter After Join (WHERE)
+SELECT c.FirstName, o.OrderID
+FROM Sales.Customers AS c
+INNER JOIN Sales.Orders AS o
+    ON c.CustomerID = o.CustomerID
+WHERE o.OrderStatus = 'Delivered';
+
+------ Filter During Join (ON)
+SELECT c.FirstName, o.OrderID
+FROM Sales.Customers AS c
+INNER JOIN Sales.Orders AS o
+    ON c.CustomerID = o.CustomerID
+   AND o.OrderStatus = 'Delivered';
+
+---- Best Practice For Big Tables
+------ Filter Before Join (SUBQUERY)
+SELECT c.FirstName, o.OrderID
+FROM Sales.Customers AS c
+INNER JOIN (
+    SELECT OrderID, CustomerID
+    FROM Sales.Orders
+    WHERE OrderStatus = 'Delivered'
+) AS o
+    ON c.CustomerID = o.CustomerID;
+
+-- Tip 12: Aggregate before joining (Big Tables)
+---- Best Practice For Small-Medium Tables
+------ Grouping and Joining
+SELECT c.CustomerID, c.FirstName, COUNT(o.OrderID) AS OrderCount
+FROM Sales.Customers AS c
+INNER JOIN Sales.Orders AS o
+    ON c.CustomerID = o.CustomerID
+GROUP BY c.CustomerID, c.FirstName;
+
+---- Best Practice For Big Tables
+------ Pre-aggregated Subquery
+SELECT c.CustomerID, c.FirstName, o.OrderCount
+FROM Sales.Customers AS c
+INNER JOIN (
+    SELECT CustomerID, COUNT(OrderID) AS OrderCount
+    FROM Sales.Orders
+    GROUP BY CustomerID
+) AS o
+    ON c.CustomerID = o.CustomerID;
+
+---- Bad Practice
+------ Correlated Subquery
+SELECT 
+    c.CustomerID, 
+    c.FirstName,
+    (SELECT COUNT(o.OrderID)
+     FROM Sales.Orders AS o
+     WHERE o.CustomerID = c.CustomerID) AS OrderCount
+FROM Sales.Customers AS c;

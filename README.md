@@ -1,5 +1,5 @@
-# SQL Full Cours
-## 📂 Repository Structure
+# SQL Full Course
+## 📂 Repository Structure for Datawarehouse Project
 ```
 sql-ultimate-course/
 │

@@ -67,5 +67,15 @@ LEFT JOIN silver.erp_px_cat_g1v2 pc
 WHERE prd_end_dt IS NULL -- filter out all historical data
 )t GROUP BY prd_key
 HAVING COUNT(*) > 1;
--- ===============
 
+SELECT
+  sd.sls_ord_num,
+  sd.sls_prd_key,
+  sd.sls_cust_id,
+  sd.sls_order_dt,
+  sd.sls_ship_dt,
+  sd.sls_due_dt,
+  sd.sls_sales,
+  sd.sls_quantity,
+  sd.sls_price
+FROM silver.crm_sales_details sd

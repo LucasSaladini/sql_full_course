@@ -39,6 +39,9 @@ SELECT DISTINCT
   cst_marital_status
 FROM silver.crm_cust_info;
 
+PRINT '>> Truncating table silver.crm_cust_info';
+TRUNCATE TABLE silver.crm_cust_info;
+PRINT '>> Inserting data into: silver.crm_cust_info';
 INSERT INTO silver.crm_cust_info (
   cst_id,
   cst_key,
@@ -171,6 +174,9 @@ WHERE prd_key IN ('AC-HE-HL-U509-R', 'AC-HE-HL-U509');
 SELECT * FROM silver.crm_prd_info;
 
 -- ======================
+PRINT '>> Truncating table silver.crm_prd_info';
+TRUNCATE TABLE silver.crm_prd_info;
+PRINT '>> Inserting data into: silver.crm_prd_info';
 INSERT INTO silver.crm_prd_info (
   prd_id,
   cat_id,
@@ -440,6 +446,9 @@ WHERE sls_sales != sls_quantity * sls_price
 ORDER BY sls_sales, sls_quantity, sls_price;
 
 -- ======================
+PRINT '>> Truncating table silver.crm_sales_details';
+TRUNCATE TABLE silver.crm_sales_details;
+PRINT '>> Inserting data into: silver.crm_sales_details';
 INSERT INTO silver.crm_sales_details (
   sls_ord_num,
   sls_prd_key,
@@ -507,6 +516,9 @@ SELECT DISTINCT
 FROM silver.erp_cust_az12;
 
 -- ======================
+PRINT '>> Truncating table silver.erp_cust_az12';
+TRUNCATE TABLE silver.erp_cust_az12;
+PRINT '>> Inserting data into: silver.erp_cust_az12';
 INSERT INTO silver.erp_cust_az12 (cid, bdate, gen)
 SELECT
   CASE WHEN cid LIKE 'NAS%' THEN SUBSSTRING(cid, 4, LEN(cid))
@@ -538,6 +550,9 @@ SELECT DISTINCT cntry
 FROM bronze.erp_loc_a101;
 
 -- ======================
+PRINT '>> Truncating table silver.erp_loc_a101';
+TRUNCATE TABLE silver.erp_loc_a101;
+PRINT '>> Inserting data into: silver.erp_loc_a101';
 INSERT INTO silver.erp_loc_a101 (cid, cntry)
 SELECT
   REPLACE(cid, '-', '') cid,
@@ -568,6 +583,9 @@ SELECT DISTINCT
 FROM bronze.erp_px_cat_g1v2;
 
 -- ======================
+PRINT '>> Truncating table silver.erp_px_cat_g1v2';
+TRUNCATE TABLE silver.erp_px_cat_g1v2;
+PRINT '>> Inserting data into: silver.erp_px_cat_g1v2';
 INSERT INTO silver.erp_px_cat_g1v2
 (id, cat, subcat, maintenance)
 SELECT
